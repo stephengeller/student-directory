@@ -5,23 +5,23 @@ def print_header
 end
 
 students = [
-  "Dr. Hannibal Lecter",
-  "Darth Vader",
-  "Nurse Ratched",
-  "Michael Corleone",
-  "Alex DeLarge",
-  "The Wicked Witch of the West",
-  "Terminator",
-  "Freddy Krueger",
-  "The Joker",
-  "Joffrey Baratheon",
-  "Norman Bates",
-  "Mr Killgrave"
+  {name: "Dr. Hannibal Lecter", cohort: :july},
+  {name: "Darth Vader", cohort: :july},
+  {name: "Nurse Ratched", cohort: :july},
+  {name: "Michael Corleone", cohort: :july},
+  {name: "Alex DeLarge", cohort: :july},
+  {name: "The Wicked Witch of the West", cohort: :july},
+  {name: "Terminator", cohort: :july},
+  {name: "Freddy Krueger", cohort: :july},
+  {name: "The Joker", cohort: :july},
+  {name: "Joffrey Baratheon", cohort: :july},
+  {name: "Norman Bates", cohort: :july},
+  {name: "Mr Killgrave", cohort: :july}
 ]
 
-def print(names)
-  names.each do |name|
-    puts name
+def print(students)
+  students.each do |student|
+    puts "#{student[:name]} (#{student[:cohort]} cohort)"
   end
 end
 
