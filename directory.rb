@@ -1,29 +1,36 @@
-def interactive_menu
-  students = []
-  loop do
-    puts "1. Input the students"
-    puts "2. Show the students"
-    puts "9. Exit"
-    selection = gets.chomp
-    case selection
-      when "1"
-        # input the students
-        students = input_students
-      when "2"
-        # show the students
-        print_header
-        print(students)
-        print_footer(students)
-      when "9"
-        exit
-      else
-        puts "I don't know what you meant, try again"
-    end
-
-
+def process(selection)
+  case selection
+    when "1"
+      @students = input_students
+    when "2"
+      show_students
+    when "9"
+      exit
+    else
+      puts "I don't know what you meant, try again"
   end
+end
 
+def print_menu
+  puts "1. Input the students"
+  puts "2. Show the students"
+  puts "9. Exit"
+end
 
+def interactive_menu
+  @students = []
+  loop do
+    # Print menu
+    print_menu
+    process(gets.chomp)
+    # interpret user selection
+  end
+end
+
+def show_students
+  print_header
+  print(@students)
+  print_footer(@students)
 end
 
 
@@ -31,33 +38,13 @@ def input_students
   puts "Please enter the names of the students"
   puts "To finish, just hit return twice"
   # create an empty array
-  students = []
+  @students = []
 
   # get the first name
   name = gets.gsub(/\n/, "")
   # while the name is not empty, repeat this code
 
-  def ask(keys)
-    puts "Please insert a value for the person's #{keys}"
-    response = gets.gsub(/\n/, '').to_sym
-    response
-  end
 
-  def change_response
-    puts "Do you want to change any details for this student? Type name, cohort, hobby, height, or return to continue"
-    response = gets.gsub(/\n/, "")
-
-    until response.empty? do
-      puts "What would you like the new response for #{response} to be?"
-      hash = students.find { |h| h[response.to_sym] }
-      puts "Your new list is #{hash}"
-      new_resp = gets.gsub(/\n/, "")
-      hash[response.to_sym] = new_resp.to_sym
-      puts "Would you like to change anything else? (name, cohort, hobby, country, or return to exit)"
-      response = gets.gsub(/\n/, "")
-    end
-
-  end
 
   keys = [:cohort, :hobby, :country]
 
@@ -68,17 +55,39 @@ def input_students
       person[key] = ask(key)
       person[key] = "missing" if person[key] == :""
     end
-    students << person
+    @students << person
 
     change_response
 
-    puts "Now we have #{students.count} student#{"s" if students.count > 1}"
+    puts "Now we have #{@students.count} student#{"s" if @students.count > 1}"
     # get another name from the user
     name = gets.gsub(/\n/, "")
   end
 
   # return the array of students
-  students
+  @students
+end
+
+def ask(keys)
+  puts "Please insert a value for the person's #{keys}"
+  response = gets.gsub(/\n/, '').to_sym
+  response
+end
+
+def change_response
+  puts "Do you want to change any details for this student? Type name, cohort, hobby, height, or return to continue"
+  response = gets.gsub(/\n/, "")
+
+  until response.empty? do
+    puts "What would you like the new response for #{response} to be?"
+    hash = @students.find { |h| h[response.to_sym] }
+    puts "Your new list is #{hash}"
+    new_resp = gets.gsub(/\n/, "")
+    hash[response.to_sym] = new_resp.to_sym
+    puts "Would you like to change anything else? (name, cohort, hobby, country, or return to exit)"
+    response = gets.gsub(/\n/, "")
+  end
+
 end
 
 
@@ -88,7 +97,7 @@ def print_header
   puts "-------------"
 end
 
-students = [
+@students = [
   {name: "Dr. Hannibal Lecter", cohort: :july},
   {name: "Darth Vader", cohort: :july, hobby: :cricket, country: :DeathStar},
   {name: "Nurse Ratched", cohort: :july},
@@ -103,7 +112,7 @@ students = [
   {name: "Mr Killgrave", cohort: :july}
 ]
 
-def print(students)
+def print_students_list(students)
 
   students = students.group_by {|hash| hash[:cohort]}.values
   students.each do |student|
@@ -121,7 +130,4 @@ def print_footer(names)
 end
 
 
-students = input_students
-print_header
-print(students)
-print_footer(students)
+interactive_menu
