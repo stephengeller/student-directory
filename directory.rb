@@ -4,6 +4,8 @@ def process(selection)
       @students = input_students
     when "2"
       show_students
+    when "3"
+      save_students
     when "9"
       exit
     else
@@ -14,6 +16,7 @@ end
 def print_menu
   puts "1. Input the students"
   puts "2. Show the students"
+  puts "3. Save the list to students.csv"
   puts "9. Exit"
 end
 
@@ -44,8 +47,6 @@ def input_students
   name = gets.gsub(/\n/, "")
   # while the name is not empty, repeat this code
 
-
-
   keys = [:cohort, :hobby, :country]
 
   until name.empty? do
@@ -60,11 +61,9 @@ def input_students
     change_response
 
     puts "Now we have #{@students.count} student#{"s" if @students.count > 1}"
-    # get another name from the user
     name = gets.gsub(/\n/, "")
   end
 
-  # return the array of students
   @students
 end
 
@@ -87,7 +86,6 @@ def change_response
     puts "Would you like to change anything else? (name, cohort, hobby, country, or return to exit)"
     response = gets.gsub(/\n/, "")
   end
-
 end
 
 
@@ -113,7 +111,6 @@ end
 ]
 
 def print_students_list(students)
-
   students = students.group_by {|hash| hash[:cohort]}.values
   students.each do |student|
     student.each_with_index do |s, index|
@@ -127,6 +124,17 @@ end
 
 def print_footer(names)
   puts "Overall, we have #{names.count} great students"
+end
+
+def save_students
+  file = File.open("stduents.csv", "w")
+  # iterate over the array of students
+  @students.each do |student|
+    student_data = [student[:name], student[:cohort]]
+    csv_line = student_data.join(",")
+    file.puts csv_line
+  end
+  file.close
 end
 
 
