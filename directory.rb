@@ -6,6 +6,8 @@ def process(selection)
       show_students
     when "3"
       save_students
+    when "4"
+      load_students
     when "9"
       exit
     else
@@ -17,6 +19,7 @@ def print_menu
   puts "1. Input the students"
   puts "2. Show the students"
   puts "3. Save the list to students.csv"
+  puts "4. Load the list from students.csv"
   puts "9. Exit"
 end
 
@@ -25,30 +28,26 @@ def interactive_menu
   loop do
     # Print menu
     print_menu
-    process(gets.chomp)
+    process(STDIN.gets.chomp)
     # interpret user selection
   end
 end
 
 def show_students
   print_header
-  print(@students)
+  print_students_list(@students)
   print_footer(@students)
 end
-
 
 def input_students
   puts "Please enter the names of the students"
   puts "To finish, just hit return twice"
   # create an empty array
   @students = []
-
   # get the first name
-  name = gets.gsub(/\n/, "")
+  name = STDIN.gets.gsub(/\n/, "")
   # while the name is not empty, repeat this code
-
   keys = [:cohort, :hobby, :country]
-
   until name.empty? do
     person = Hash.new { |this_hash, key| this_hash[key] = "missing" }
     person[:name] = name
@@ -57,11 +56,10 @@ def input_students
       person[key] = "missing" if person[key] == :""
     end
     @students << person
-
+    puts person
     change_response
-
-    puts "Now we have #{@students.count} student#{"s" if @students.count > 1}"
-    name = gets.gsub(/\n/, "")
+    puts "You have added #{@students.count} student#{"s" if @students.count > 1}. Type in another name to add or press return to proceed"
+    name = STDIN.gets.gsub(/\n/, "")
   end
 
   @students
@@ -69,12 +67,12 @@ end
 
 def ask(keys)
   puts "Please insert a value for the person's #{keys}"
-  response = gets.gsub(/\n/, '').to_sym
+  response = STDIN.gets.gsub(/\n/, '').to_sym
   response
 end
 
 def change_response
-  puts "Do you want to change any details for this student? Type name, cohort, hobby, height, or return to continue"
+  puts "Do you want to change any details for this student? Type name, cohort, hobby, country, or return to continue"
   response = gets.gsub(/\n/, "")
 
   until response.empty? do
@@ -88,8 +86,6 @@ def change_response
   end
 end
 
-
-#first we print the list of students
 def print_header
   puts "The students of Villains Academy"
   puts "-------------"
@@ -127,15 +123,37 @@ def print_footer(names)
 end
 
 def save_students
-  file = File.open("stduents.csv", "w")
+  file = File.open("students.csv", "w")
   # iterate over the array of students
   @students.each do |student|
-    student_data = [student[:name], student[:cohort]]
+    student_data = [student[:name], student[:cohort], student[:hobby], student[:country]]
     csv_line = student_data.join(",")
     file.puts csv_line
   end
   file.close
+  puts "Student list has been saved to the databse"
 end
 
+def load_students(filename = "students.csv")
+  file = File.open(filename, "r")
+  file.readlines.each do |line|
+    name, cohort, hobby, country = line.chomp.split(',')
+    @students << {name: name, cohort: cohort, hobby: hobby, country: country}
+  end
+  file.close
+end
 
+def try_load_students
+  filename = ARGV.first
+  return if filename.nil?
+  if File.exist?(filename)
+    load_students(filename)
+    puts "Loaded #{@students.count} from #{filename}"
+  else
+    puts "Sorry, #{filename} doesn't exist"
+    exit
+  end
+end
+
+try_load_students
 interactive_menu
