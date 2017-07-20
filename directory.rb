@@ -1,7 +1,30 @@
+@students = []
+
+def print_menu
+  puts "1. Input the students"
+  puts "2. Show the students"
+  puts "3. Save the list to students.csv"
+  puts "4. Load the list from students.csv"
+  puts "9. Exit"
+end
+
+def interactive_menu
+  loop do
+    print_menu
+    process(STDIN.gets.chomp)
+  end
+end
+
+def show_students
+  print_header
+  print_students_list(@students)
+  print_footer(@students)
+end
+
 def process(selection)
   case selection
     when "1"
-      @students = input_students
+      input_students
     when "2"
       show_students
     when "3"
@@ -15,37 +38,11 @@ def process(selection)
   end
 end
 
-def print_menu
-  puts "1. Input the students"
-  puts "2. Show the students"
-  puts "3. Save the list to students.csv"
-  puts "4. Load the list from students.csv"
-  puts "9. Exit"
-end
-
-def interactive_menu
-  @students = []
-  loop do
-    # Print menu
-    print_menu
-    process(STDIN.gets.chomp)
-    # interpret user selection
-  end
-end
-
-def show_students
-  print_header
-  print_students_list(@students)
-  print_footer(@students)
-end
-
 def input_students
   puts "Please enter the names of the students"
   puts "To finish, just hit return twice"
-  # create an empty array
-  @students = []
-  # get the first name
-  name = STDIN.gets.gsub(/\n/, "")
+  @students = []                      # create an empty array
+  name = STDIN.gets.gsub(/\n/, "")   # get the first name
   # while the name is not empty, repeat this code
   keys = [:cohort, :hobby, :country]
   until name.empty? do
@@ -91,20 +88,20 @@ def print_header
   puts "-------------"
 end
 
-@students = [
-  {name: "Dr. Hannibal Lecter", cohort: :july},
-  {name: "Darth Vader", cohort: :july, hobby: :cricket, country: :DeathStar},
-  {name: "Nurse Ratched", cohort: :july},
-  {name: "Michael Corleone", cohort: :november},
-  {name: "Alex DeLarge", cohort: :july},
-  {name: "The Wicked Witch of the West", cohort: :july},
-  {name: "Terminator", cohort: :june},
-  {name: "Freddy Krueger", cohort: :july},
-  {name: "The Joker", cohort: :july},
-  {name: "Joffrey Baratheon", cohort: :july},
-  {name: "Norman Bates", cohort: :july},
-  {name: "Mr Killgrave", cohort: :july}
-]
+# @students = [
+#   {name: "Dr. Hannibal Lecter", cohort: :july},
+#   {name: "Darth Vader", cohort: :july, hobby: :cricket, country: :DeathStar},
+#   {name: "Nurse Ratched", cohort: :july},
+#   {name: "Michael Corleone", cohort: :november},
+#   {name: "Alex DeLarge", cohort: :july},
+#   {name: "The Wicked Witch of the West", cohort: :july},
+#   {name: "Terminator", cohort: :june},
+#   {name: "Freddy Krueger", cohort: :july},
+#   {name: "The Joker", cohort: :july},
+#   {name: "Joffrey Baratheon", cohort: :july},
+#   {name: "Norman Bates", cohort: :july},
+#   {name: "Mr Killgrave", cohort: :july}
+# ]
 
 def print_students_list(students)
   students = students.group_by {|hash| hash[:cohort]}.values
@@ -145,7 +142,7 @@ end
 
 def try_load_students
   filename = ARGV.first
-  return if filename.nil?
+  return load_students("students.csv") if filename.nil? # REMOVE load_students () to revert to old v
   if File.exist?(filename)
     load_students(filename)
     puts "Loaded #{@students.count} from #{filename}"
