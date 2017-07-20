@@ -1,11 +1,12 @@
 @students = []
+@load_status = 0
 
 def print_menu
-  puts "1. Input the students"
-  puts "2. Show the students"
-  puts "3. Save the list to students.csv"
-  puts "4. Load the list from students.csv"
-  puts "9. Exit"
+  puts '1. Input the students'
+  puts '2. Show the students'
+  puts '3. Save the list to students.csv'
+  puts '4. Load the list from students.csv'
+  puts '9. Exit'
 end
 
 def interactive_menu
@@ -23,34 +24,36 @@ end
 
 def process(selection)
   case selection
-    when "1"
+    when '1'
+      puts "You have chosen to input a student\n\n"
       input_students
-    when "2"
+    when '2'
+      puts "\n\nShowing students...\n\n"
       show_students
-    when "3"
+    when '3'
       save_students
-    when "4"
+    when '4'
       load_students
-    when "9"
+    when '9'
+      puts 'Exiting the student directory program.'
+      puts 'See you soon!'.center(30, '-')
       exit
     else
-      puts "I don't know what you meant, try again"
+      puts "Invalid input, try again\n\n"
   end
 end
 
 def input_students
-  puts "Please enter the names of the students"
-  puts "To finish, just hit return twice"
-  @students = []                      # create an empty array
-  name = STDIN.gets.gsub(/\n/, "")   # get the first name
-  # while the name is not empty, repeat this code
+  puts 'Please enter the names of the students'
+  puts 'To finish, just hit return twice'
+  name = STDIN.gets.gsub(/\n/, "")
   keys = [:cohort, :hobby, :country]
   until name.empty? do
-    person = Hash.new { |this_hash, key| this_hash[key] = "missing" }
+    person = Hash.new { |this_hash, key| this_hash[key] = 'missing'}
     person[:name] = name
     keys.each do |key|
       person[key] = ask(key)
-      person[key] = "missing" if person[key] == :""
+      person[key] = 'missing' if person[key] == :""
     end
     @students << person
     puts person
@@ -58,50 +61,33 @@ def input_students
     puts "You have added #{@students.count} student#{"s" if @students.count > 1}. Type in another name to add or press return to proceed"
     name = STDIN.gets.gsub(/\n/, "")
   end
-
   @students
 end
 
 def ask(keys)
   puts "Please insert a value for the person's #{keys}"
-  response = STDIN.gets.gsub(/\n/, '').to_sym
-  response
+  STDIN.gets.gsub(/\n/, '').to_sym
 end
 
 def change_response
-  puts "Do you want to change any details for this student? Type name, cohort, hobby, country, or return to continue"
+  puts 'Do you want to change any details for this student? Type name, cohort, hobby, country, or return to continue'
   response = gets.gsub(/\n/, "")
 
   until response.empty? do
     puts "What would you like the new response for #{response} to be?"
     hash = @students.find { |h| h[response.to_sym] }
-    puts "Your new list is #{hash}"
     new_resp = gets.gsub(/\n/, "")
     hash[response.to_sym] = new_resp.to_sym
-    puts "Would you like to change anything else? (name, cohort, hobby, country, or return to exit)"
+    puts "Your new list is #{hash}\n\n"
+    puts 'Would you like to change anything else? (name, cohort, hobby, country, or return to exit)'
     response = gets.gsub(/\n/, "")
   end
 end
 
 def print_header
-  puts "The students of Villains Academy"
-  puts "-------------"
+  puts 'The students of Villains Academy'
+  puts '-------------'
 end
-
-# @students = [
-#   {name: "Dr. Hannibal Lecter", cohort: :july},
-#   {name: "Darth Vader", cohort: :july, hobby: :cricket, country: :DeathStar},
-#   {name: "Nurse Ratched", cohort: :july},
-#   {name: "Michael Corleone", cohort: :november},
-#   {name: "Alex DeLarge", cohort: :july},
-#   {name: "The Wicked Witch of the West", cohort: :july},
-#   {name: "Terminator", cohort: :june},
-#   {name: "Freddy Krueger", cohort: :july},
-#   {name: "The Joker", cohort: :july},
-#   {name: "Joffrey Baratheon", cohort: :july},
-#   {name: "Norman Bates", cohort: :july},
-#   {name: "Mr Killgrave", cohort: :july}
-# ]
 
 def print_students_list(students)
   students = students.group_by {|hash| hash[:cohort]}.values
@@ -120,7 +106,9 @@ def print_footer(names)
 end
 
 def save_students
-  file = File.open("students.csv", "w")
+  puts 'What file would you like to save these students to?'
+  filename = gets.chomp
+  file = File.open(filename, "w")
   # iterate over the array of students
   @students.each do |student|
     student_data = [student[:name], student[:cohort], student[:hobby], student[:country]]
@@ -128,29 +116,46 @@ def save_students
     file.puts csv_line
   end
   file.close
-  puts "Student list has been saved to the databse"
+  puts "Student list has been saved to #{filename}"
 end
 
 def load_students(filename = "students.csv")
-  file = File.open(filename, "r")
-  file.readlines.each do |line|
-    name, cohort, hobby, country = line.chomp.split(',')
-    @students << {name: name, cohort: cohort, hobby: hobby, country: country}
+  if @load_status == 1
+    puts 'Which file would you like to load the students from? Press return to skip'
+    filename = gets.chomp
   end
-  file.close
+
+  until filename.empty?
+    if File.exist?(filename)
+      puts "\n\nLoading from #{filename}...\n\n".center(50, "-")
+      file = File.open(filename, "r")
+      file.readlines.each do |line|
+        name, cohort, hobby, country = line.chomp.split(',')
+        @students << {name: name, cohort: cohort, hobby: hobby, country: country} unless @students.include?(name: name)
+      end
+      file.close
+      @load_status += 1
+      puts "Loaded #{@students.count} students from #{filename}\n\n"
+      break
+    else
+      puts 'File not found. Please input a valid file, or press return to skip'
+      filename = gets.chomp
+    end
+  end
 end
 
-def try_load_students
+def initial_load
   filename = ARGV.first
-  return load_students("students.csv") if filename.nil? # REMOVE load_students () to revert to old v
-  if File.exist?(filename)
+  if filename.nil?
+    load_students("students.csv")
+    puts "Loaded #{@students.count} from #{"students.csv"}"
+  elsif File.exist?(filename)
     load_students(filename)
-    puts "Loaded #{@students.count} from #{filename}"
   else
     puts "Sorry, #{filename} doesn't exist"
     exit
   end
 end
 
-try_load_students
+initial_load
 interactive_menu
