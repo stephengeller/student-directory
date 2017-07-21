@@ -1,5 +1,9 @@
+require 'csv'
+@students_csv = CSV.read('students.csv')
+
 @students = []
 @load_status = 0
+#p @students_csv
 
 def print_menu
   puts '1. Input the students'
@@ -108,18 +112,23 @@ end
 def save_students
   puts 'What file would you like to save these students to?'
   filename = gets.chomp
-  file = File.open(filename, "w")
-  # iterate over the array of students
-  @students.each do |student|
-    student_data = [student[:name], student[:cohort], student[:hobby], student[:country]]
-    csv_line = student_data.join(",")
-    file.puts csv_line
+  if File.exist?(filename)
+    puts "File #{filename} found\n\n"
+  else
+    puts "File not found...creating a new file called #{filename}\n\n"
   end
-  file.close
-  puts "Student list has been saved to #{filename}"
+  File.open(filename, "w") do |file|
+    # iterate over the array of students
+    @students.each do |student|
+      student_data = [student[:name], student[:cohort], student[:hobby], student[:country]]
+      csv_line = student_data.join(",")
+      file.puts csv_line
+      end
+  end
+  puts "#{@students.count} students have been saved to #{filename}\n\n"
 end
 
-def load_students(filename = "students.csv")
+def load_students(filename = @students_csv)
   if @load_status == 1
     puts 'Which file would you like to load the students from? Press return to skip'
     filename = gets.chomp
@@ -128,12 +137,12 @@ def load_students(filename = "students.csv")
   until filename.empty?
     if File.exist?(filename)
       puts "\n\nLoading from #{filename}...\n\n".center(50, "-")
-      file = File.open(filename, "r")
-      file.readlines.each do |line|
-        name, cohort, hobby, country = line.chomp.split(',')
-        @students << {name: name, cohort: cohort, hobby: hobby, country: country} unless @students.include?(name: name)
+      File.open(filename, "r") do |file|
+        file.readlines.each do |line|
+          name, cohort, hobby, country = line.chomp.split(',')
+          @students << {name: name, cohort: cohort, hobby: hobby, country: country} #unless @students.each {|hash| hash.has_value?(cohort)}
+        end
       end
-      file.close
       @load_status += 1
       puts "Loaded #{@students.count} students from #{filename}\n\n"
       break
@@ -148,9 +157,10 @@ def initial_load
   filename = ARGV.first
   if filename.nil?
     load_students("students.csv")
-    puts "Loaded #{@students.count} from #{"students.csv"}"
+    puts "Loaded #{@students.count} from #{filename}"
   elsif File.exist?(filename)
     load_students(filename)
+    puts "Loaded #{@students.count} from #{filename}"
   else
     puts "Sorry, #{filename} doesn't exist"
     exit
@@ -158,4 +168,5 @@ def initial_load
 end
 
 initial_load
+#p @students
 interactive_menu
