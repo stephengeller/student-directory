@@ -1,9 +1,12 @@
+puts File.read($0)
+
 require 'csv'
 @students_csv = CSV.read('students.csv')
 
+puts "Running #{__FILE__}..."
+
 @students = []
 @load_status = 0
-#p @students_csv
 
 def print_menu
   puts '1. Input the students'
@@ -60,7 +63,7 @@ def input_students
       person[key] = 'missing' if person[key] == :""
     end
     @students << person
-    puts person
+    puts "You have added #{person[:name]} to the list, in the #{person[:cohort]} cohort\n\n"
     change_response
     puts "You have added #{@students.count} student#{"s" if @students.count > 1}. Type in another name to add or press return to proceed"
     name = STDIN.gets.gsub(/\n/, "")
@@ -115,7 +118,13 @@ def save_students
   if File.exist?(filename)
     puts "File #{filename} found\n\n"
   else
-    puts "File not found...creating a new file called #{filename}\n\n"
+    puts "File not found...would you like to crete a new one? Y/n"
+    answer = gets.chomp
+    case answer
+      when answer.downcase == "y"
+        puts "creating a new file called #{filename}\n\n"
+      when answer.downcase == "n"
+    end
   end
   File.open(filename, "w") do |file|
     # iterate over the array of students
@@ -135,6 +144,8 @@ def load_students(filename = @students_csv)
   end
 
   until filename.empty?
+
+    # TODO - Change this into CSV. format
     if File.exist?(filename)
       puts "\n\nLoading from #{filename}...\n\n".center(50, "-")
       File.open(filename, "r") do |file|
@@ -166,6 +177,7 @@ def initial_load
     exit
   end
 end
+
 
 initial_load
 #p @students
